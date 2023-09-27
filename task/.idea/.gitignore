@@ -1,3 +1,9 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+#Ignore all xml files
+*.xml
+
+db.sqlite3
+
+#Ignore migration folder
+migrations
+
+

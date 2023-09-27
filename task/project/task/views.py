@@ -16,16 +16,13 @@ class CreateTaskView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user_id = request.data["assigned_to"]
-            print(user_id)
-            if not Employee_id(user_id):
+            assigned_id = request.data["assigned_to"]
+            if not Employee_id(assigned_id):
                 return Response(
                     {"msg": "You Don't Have Permission To Add This"}, status=status.HTTP_401_UNAUTHORIZED
                 )
-            user_name = request.user.userProfiles
-            print(user_name)
-            serializer.initial_data["assigned_by"] = user_name
-            serializer.is_valid()
+            user_id = request.user.id
+            serializer.initial_data["assigned_by"] = user_id
             serializer.save()
             return Response(serializer.data)
         except Exception:

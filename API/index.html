@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Knowledge Base</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Knowledge Base</h1>
+    <form id="entryForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <label for="class">Class:</label>
+        <input type="text" id="class" required>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" required>
+        <button type="submit">Add Entry</button>
+    </form>
+    <table id="entryTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Date of Birth</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+    <script>
+        function fetchData() {
+            fetch('http://localhost:3000/knowledge_base')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('tableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(entry => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${entry.name}</td>
+                            <td>${entry.class}</td>
+                            <td>${entry.date_of_birth}</td>
+                            <td>
+                                <button onclick="editEntry('${entry._id}', '${entry.name}', '${entry.class}', '${entry.date_of_birth}')">Edit</button>
+                                <button onclick="deleteEntry('${entry._id}')">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+        }
+
+        function addOrUpdateEntry(id, name, classValue, dob) {
+            const entry = {
+                name: name,
+                class: classValue,
+                date_of_birth: dob
+            };
+
+            if (id) {
+                fetch(`/knowledge_base/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(entry)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('entryForm').reset();
+                    fetchData();
+                });
+            } else {
+                fetch('/knowledge_base', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(entry)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('entryForm').reset();
+                    fetchData();
+                });
+            }
+        }
+
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                fetch(`/knowledge_base/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchData();
+                });
+            }
+        }
+
+        function editEntry(id, name, classValue, dob) {
+            document.getElementById('name').value = name;
+            document.getElementById('class').value = classValue;
+            document.getElementById('dob').value = dob;
+            const entryForm = document.getElementById('entryForm');
+            entryForm.onsubmit = function (event) {
+                event.preventDefault();
+                addOrUpdateEntry(id, name, classValue, dob);
+            };
+        }
+
+        document.getElementById('entryForm').onsubmit = function (event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const classValue = document.getElementById('class').value;
+            const dob = document.getElementById('dob').value;
+            addOrUpdateEntry(null, name, classValue, dob);
+        };
+
+        // Fetch initial data from the API
+        fetchData();
+    </script>
+</body>
+</html>

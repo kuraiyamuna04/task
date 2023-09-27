@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import TaskModel
 
 
-class CreateTaskSerializers(serializers.ModelSerializer):
+class TaskSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = TaskModel

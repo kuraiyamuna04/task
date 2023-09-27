@@ -1,9 +1,0 @@
-1. fetch user role from access token 
-
-2. fun base view - decorator / class base - permission class
-
- 
-1-signup-user,userprofile done
-2- login done
-3- view profile-for admin , for others done
-4 update profile - user, userprofile 

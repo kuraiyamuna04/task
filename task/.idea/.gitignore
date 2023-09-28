@@ -1,9 +1,16 @@
 #Ignore all xml files
 *.xml
 
-db.sqlite3
+task/.idea/.gitignore
 
-#Ignore migration folder
-migrations
+task/mediafiles/
 
+task/project/db.sqlite3
 
+task/.idea/inspectionProfiles
+
+task.iml
+
+task/project/app/migrations
+
+task/project/task/migrations

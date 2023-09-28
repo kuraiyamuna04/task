@@ -32,7 +32,7 @@ class ProfileView(APIView):
         user_id = request.user.id
         try:
             user = UserProfile.objects.get(user=user_id)
-            serializer = UserProfileSerializer(user)
+            serializer = UserProfileSerializer(user, context={'request': request})
             return Response(serializer.data)
         except UserProfile.DoesNotExist:
             return Response(no_data, status=status.HTTP_404_NOT_FOUND)
@@ -41,15 +41,17 @@ class ProfileView(APIView):
         user_id = request.user.id
         try:
             user_profile = UserProfile.objects.get(user_id=user_id)
-            profile_serializer = UserProfileSerializer(instance=user_profile, data=request.data)
+            profile_serializer = UserProfileSerializer(
+                instance=user_profile, data=request.data, context={'request': request}
+            )
 
             if not profile_serializer.is_valid():
                 return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST
-                            )
+                                )
             profile_serializer.save()
             return Response(profile_serializer.data)
         except UserProfile.DoesNotExists:
-            return Response(no_data,status.HTTP_400_BAD_REQUEST)
+            return Response(no_data, status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -81,7 +83,9 @@ class UpdateProfileView(APIView):
     def put(self, request, pk):
         try:
             user_profile = UserProfile.objects.get(user_id=pk)
-            profile_serializer = UserProfileSerializer(instance=user_profile, data=request.data)
+            profile_serializer = UserProfileSerializer(
+                instance=user_profile, data=request.data, context={'request': request}
+            )
 
             if not profile_serializer.is_valid():
                 return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST

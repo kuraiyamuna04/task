@@ -4,7 +4,7 @@ from rest_framework.generics import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
-from .serializers import TaskSerializers
+from .serializers import TaskSerializers,TaskDetailsSerializer
 from utils.helper import Employee_id
 from .models import TaskModel
 from utils.msg import *
@@ -19,7 +19,7 @@ class ManagerAccessView(APIView):
             assigned_id = request.data["assigned_to"]
             if not Employee_id(assigned_id):
                 return Response(
-                {"msg": "You Don't Have Permission To Add This"}, status=status.HTTP_401_UNAUTHORIZED
+                    unauthorised, status=status.HTTP_401_UNAUTHORIZED
                 )
             serializer.initial_data["assigned_by"] = request.user.id
             if not serializer.is_valid():
@@ -28,12 +28,12 @@ class ManagerAccessView(APIView):
             return Response(serializer.data)
 
         except Exception:
-            return Response({"msg:You entered wrong data"}, status.HTTP_400_BAD_REQUEST)
+            return Response(wrong_data, status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = request.user.id
         task = TaskModel.objects.filter(assigned_by=user)
-        serializer = TaskSerializers(task, many=True)
+        serializer = TaskDetailsSerializer(task, many=True)
         return Response(serializer.data)
 
 
@@ -50,10 +50,10 @@ class EmployeeAccessView(APIView):
     def get(self, request):
         try:
             task = TaskModel.objects.get(assigned_to=request.user.id)
-            serializer = TaskSerializers(task, many=False)
+            serializer = TaskDetailsSerializer(task, many=False)
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
-            return Response(no_data,status.HTTP_400_BAD_REQUEST)
+            return Response(no_data, status.HTTP_400_BAD_REQUEST)
 
 
 class PatchUpdateView(APIView):

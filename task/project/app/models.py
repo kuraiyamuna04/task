@@ -14,7 +14,8 @@ ROLES = (("A", "admin"),
 def get_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join('', filename)
+    path = os.path.join('', filename)
+    return context['request'].build_absolute_uri(obj.profile_img)
 
 
 class CustomUser(AbstractUser):

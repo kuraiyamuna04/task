@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 
 ]
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ALGORITHM': 'HS512',
     'SIGNING_KEY': SECRET_KEY

@@ -61,7 +61,9 @@ class LoginView(APIView):
         phone = serializer.initial_data["phone_number"]
         user = authenticate(request, phone_number=phone, password=password)
         if not user:
-            return Response(wrong_cred, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                wrong_cred, status=status.HTTP_401_UNAUTHORIZED
+            )
         Refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(Refresh),
@@ -84,14 +86,19 @@ class UpdateProfileView(APIView):
         try:
             user_profile = UserProfile.objects.get(user_id=pk)
             profile_serializer = UserProfileSerializer(
-                instance=user_profile, data=request.data, context={'request': request}
+                instance=user_profile,
+                data=request.data,
+                context={'request': request}
             )
 
             if not profile_serializer.is_valid():
-                return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST
+                return Response(
+                    wrong_data, status=status.HTTP_400_BAD_REQUEST
                                 )
             profile_serializer.save()
-            return Response(success, status=status.HTTP_200_OK)
+            return Response(
+                success, status=status.HTTP_200_OK
+            )
         except UserProfile.DoesNotExist:
             return Response({
                 wrong_data
@@ -104,7 +111,8 @@ class CreateView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
                             )
         serializer.save()
         return Response(serializer.data)
@@ -123,8 +131,12 @@ class ManagerCreateProfileView(APIView):
                 )
             serializer = UserProfileSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                )
             serializer.save()
             return Response(success)
         except Exception:
-            return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                wrong_data, status=status.HTTP_400_BAD_REQUEST
+            )

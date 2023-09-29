@@ -1,9 +1,11 @@
 from rest_framework import serializers
+
 from .models import TaskModel
+from app.models import CustomUser, UserProfile
+from app.serializerls import UserProfileSerializer, UserSerializer
 
 
 class TaskSerializers(serializers.ModelSerializer):
-
     class Meta:
         model = TaskModel
         fields = "__all__"
@@ -15,20 +17,21 @@ class TaskDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskModel
-        fields = ("task", "assignee","reporter")
+        fields = ("task", "assignee", "reporter")
 
     def get_assignee(self, obj):
-        user = {
-            "first_name": obj.assigned_by.userProfiles.first_name,
-            "email": obj.assigned_by.email,
-            "profile_img": obj.assigned_by.userProfiles.profile_img
-        }
-        return user
+        obj = obj.assigned_by
+        data = UserProfile.objects.get(user=obj)
+        serializer = UserProfileSerializer(
+            data, context={"request": self.context['request']}
+        )
+        return serializer.data
 
+    #
     def get_reporter(self, obj):
-        user = {
-            "first_name": obj.assigned_to.userProfiles.first_name,
-            "email": obj.assigned_to.email,
-            "profile_img": obj.assigned_to.userProfiles.profile_img
-        }
-        return user
+        obj = obj.assigned_to.id
+        data = UserProfile.objects.get(user=obj)
+        serializer = UserProfileSerializer(
+            data, context={"request": self.context['request']}
+        )
+        return serializer.data

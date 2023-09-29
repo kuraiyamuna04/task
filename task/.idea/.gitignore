@@ -1,16 +1,16 @@
 #Ignore all xml files
 *.xml
 
-task/.idea/.gitignore
-
 task/mediafiles/
 
 task/project/db.sqlite3
 
-task/.idea/inspectionProfiles
+task/.idea/inspectionProfiles/
 
 task.iml
 
-task/project/app/migrations
+task/project/app/migrations/
 
-task/project/task/migrations
+task/project/task/migrations/
+
+task/project/.idea/

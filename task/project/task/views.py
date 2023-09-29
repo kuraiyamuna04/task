@@ -4,7 +4,7 @@ from rest_framework.generics import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
-from .serializers import TaskSerializers,TaskDetailsSerializer
+from .serializers import TaskSerializers, TaskDetailsSerializer
 from utils.helper import Employee_id
 from .models import TaskModel
 from utils.msg import *
@@ -14,7 +14,10 @@ class ManagerAccessView(APIView):
     permission_classes = [IsAuthenticated, RequiredManager]
 
     def post(self, request):
-        serializer = TaskSerializers(data=request.data)
+        serializer = TaskSerializers(
+            data=request.data,
+            context={'request': self.request}
+        )
         try:
             assigned_id = request.data["assigned_to"]
             if not Employee_id(assigned_id):
@@ -23,7 +26,9 @@ class ManagerAccessView(APIView):
                 )
             serializer.initial_data["assigned_by"] = request.user.id
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                )
             serializer.save()
             return Response(serializer.data)
 
@@ -33,7 +38,9 @@ class ManagerAccessView(APIView):
     def get(self, request):
         user = request.user.id
         task = TaskModel.objects.filter(assigned_by=user)
-        serializer = TaskDetailsSerializer(task, many=True)
+        serializer = TaskDetailsSerializer(
+            task, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
 
@@ -49,10 +56,15 @@ class EmployeeAccessView(APIView):
 
     def get(self, request):
         try:
-            task = TaskModel.objects.get(assigned_to=request.user.id)
-            serializer = TaskDetailsSerializer(task, many=False)
+            user_id = request.user.id
+            if not Employee_id(user_id):
+                return Response(unauthorised, status.HTTP_400_BAD_REQUEST)
+            task = TaskModel.objects.filter(assigned_to=user_id)
+            serializer = TaskDetailsSerializer(
+                task, many=True, context={"request": request}
+            )
             return Response(serializer.data)
-        except TaskModel.DoesNotExist:
+        except Exception:
             return Response(no_data, status.HTTP_400_BAD_REQUEST)
 
 
@@ -62,7 +74,9 @@ class PatchUpdateView(APIView):
     def patch(self, request, pk):
         task = TaskModel.objects.get(assigned_to=pk)
         serializer = TaskSerializers(task, data=request.data,
-                                     partial=True)
+                                     partial=True,
+                                     context={'request': request}
+                                     )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()

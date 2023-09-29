@@ -36,12 +36,15 @@ class ManagerAccessView(APIView):
             return Response(wrong_data, status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        user = request.user.id
-        task = TaskModel.objects.filter(assigned_by=user)
-        serializer = TaskDetailsSerializer(
-            task, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
+        try:
+            user = request.user.id
+            task = TaskModel.objects.filter(assigned_by=user)
+            serializer = TaskDetailsSerializer(
+                task, many=True, context={"request": request}
+            )
+            return Response(serializer.data)
+        except TaskModel.DoesNotExist:
+            return Response(no_data, status.HTTP_400_BAD_REQUEST)
 
 
 class AdminAccessView(ListAPIView, UpdateAPIView):
@@ -72,12 +75,15 @@ class PatchUpdateView(APIView):
     permission_classes = [IsAuthenticated, RequiredManager | RequiredAdmin]
 
     def patch(self, request, pk):
-        task = TaskModel.objects.get(assigned_to=pk)
-        serializer = TaskSerializers(task, data=request.data,
-                                     partial=True,
-                                     context={'request': request}
-                                     )
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
-        return Response(serializer.data)
+        try:
+            task = TaskModel.objects.get(assigned_to=pk)
+            serializer = TaskSerializers(task, data=request.data,
+                                         partial=True,
+                                         context={'request': request}
+                                         )
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data)
+        except TaskModel.DoesNotExist:
+            return Response(no_data, status.HTTP_400_BAD_REQUEST)

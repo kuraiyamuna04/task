@@ -20,18 +20,16 @@ class TaskDetailsSerializer(serializers.ModelSerializer):
         fields = ("task", "assignee", "reporter")
 
     def get_assignee(self, obj):
-        obj = obj.assigned_by
-        data = UserProfile.objects.get(user=obj)
+        obj = obj.assigned_by.userProfiles
         serializer = UserProfileSerializer(
-            data, context={"request": self.context['request']}
+            obj, context={"request": self.context['request']}
         )
         return serializer.data
 
     #
     def get_reporter(self, obj):
-        obj = obj.assigned_to.id
-        data = UserProfile.objects.get(user=obj)
+        obj = obj.assigned_to.userProfiles
         serializer = UserProfileSerializer(
-            data, context={"request": self.context['request']}
+            obj, context={"request": self.context['request']}
         )
         return serializer.data

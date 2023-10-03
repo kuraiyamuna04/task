@@ -7,10 +7,12 @@ task/project/db.sqlite3
 
 task/.idea/inspectionProfiles/
 
-task.iml
+.idea/task.iml
 
 task/project/app/migrations/
 
 task/project/task/migrations/
 
 task/project/.idea/
+
+task/.idea

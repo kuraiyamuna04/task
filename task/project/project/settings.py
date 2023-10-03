@@ -120,3 +120,10 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'project/mediafiles')
 
 # URL used to access the media
 MEDIA_URL = '/media/'
+
+# Email Config
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'y4326997@gmail.com'
+EMAIL_HOST_PASSWORD = 'qnig otgp jajt ofmi'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

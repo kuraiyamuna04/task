@@ -1,10 +1,12 @@
-1-There are three types of user admin(A),manager(M),employee(E) and each user has their own unique profile which contains details like first_name, last_name, address, profile_img
+1- Go inside the folder task/project
 
-2-A user can sign_up using the api and can create his/her own profile
+2- Install all requirements from requirements.txt file (pip install -r requirements.txt)
 
-3- Admin -  can add a user, can add/update/view user profile , can update task
+3- Run command for makemigrations( python manage.py makemigrations)
 
-4-Manager - can add a employee, can add/update/view profile of a employee, can assigne/update tasks for employees, can view tasks
+4- Run command for migrations ( python manage.py migrate )
 
-5-Employee - can view their own profile, can view their own task, can update status of their own task
+5- Can create a superuser using command -  python manage.py createsuperuser
+
+6- Run the server ( python manage.py runserver)
           

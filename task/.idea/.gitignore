@@ -1,3 +1,16 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+#Ignore all xml files
+*.xml
+
+task/mediafiles/
+
+task/project/db.sqlite3
+
+task/.idea/inspectionProfiles/
+
+task.iml
+
+task/project/app/migrations/
+
+task/project/task/migrations/
+
+task/project/.idea/

@@ -17,6 +17,7 @@ def get_file_path(instance, filename):
     return os.path.join('', filename)
 
 
+
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(max_length=200, unique=True)

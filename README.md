@@ -1,4 +1,4 @@
-1- Go inside the folder task/project
+1- set up your .env file (for refrence you can use .envExample file)
 
 2- Install all requirements from requirements.txt file (pip install -r requirements.txt)
 

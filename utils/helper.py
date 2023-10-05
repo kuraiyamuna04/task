@@ -2,7 +2,7 @@ from app.models import CustomUser
 from django.core.mail import send_mail
 
 
-def Employee_id(user_id):
+def employee_id(user_id):
     user = CustomUser.objects.get(id=user_id)
     role = user.role
     if role == "E":
@@ -10,7 +10,7 @@ def Employee_id(user_id):
     return False
 
 
-def Send_emails(message, recipient, request):
+def send_emails(message, recipient, request):
     send_mail(
         subject="Task",
         message=message,

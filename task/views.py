@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
 from .serializers import TaskSerializers, TaskDetailsSerializer
-from utils.helper import Employee_id, Send_emails
+from utils.helper import employee_id, send_emails
 from .models import TaskModel
 from utils.msg import *
 
@@ -20,7 +20,7 @@ class ManagerAccessView(APIView):
         )
         try:
             assigned_id = request.data["assigned_to"]
-            if not Employee_id(assigned_id):
+            if not employee_id(assigned_id):
                 return Response(
                     unauthorised, status=status.HTTP_401_UNAUTHORIZED
                 )
@@ -29,9 +29,9 @@ class ManagerAccessView(APIView):
                 return Response(
                     serializer.errors, status=status.HTTP_400_BAD_REQUEST
                 )
-            s = serializer.save()
-            employee_email = s.assigned_to
-            Send_emails(assigned,employee_email,request)
+            task = serializer.save()
+            employee_email = task.assigned_to
+            send_emails(assigned, employee_email, request)
 
             return Response(serializer.data)
 
@@ -63,7 +63,7 @@ class EmployeeAccessView(APIView):
     def get(self, request):
         try:
             user_id = request.user.id
-            if not Employee_id(user_id):
+            if not employee_id(user_id):
                 return Response(unauthorised, status=status.HTTP_401_UNAUTHORIZED)
             task = TaskModel.objects.filter(assigned_to=user_id)
             serializer = TaskDetailsSerializer(
@@ -81,7 +81,7 @@ class UpdateStatusView(APIView):
         try:
             user_id = request.user.id
             task_status = request.data["status"]
-            if not Employee_id(user_id) or not task_status:
+            if not employee_id(user_id) or not task_status:
                 return Response(unauthorised, status=status.HTTP_401_UNAUTHORIZED)
 
             task = TaskModel.objects.get(id=pk, assigned_to=user_id)
@@ -89,10 +89,10 @@ class UpdateStatusView(APIView):
                                          data=request.data,
                                          partial=True)
             serializer.is_valid()
-            s = serializer.save()
+            task = serializer.save()
             if task_status == TaskModel.REVIEW:
-                manager_email = s.assigned_by
-                Send_emails(review,manager_email,request)
+                manager_email = task.assigned_by
+                send_emails(review, manager_email, request)
             return Response(serializer.data)
         except Exception:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
@@ -110,9 +110,9 @@ class UpdateTaskView(APIView):
                                          )
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            s = serializer.save()
-            employee_email = s.assigned_to
-            Send_emails(updated,employee_email,request)
+            task = serializer.save()
+            employee_email = task.assigned_to
+            send_emails(updated, employee_email, request)
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)

@@ -6,11 +6,16 @@ from app.models import CustomUser, UserProfile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True},
+                        'confirm_password': {'write_only': True}
+                        }
         fields = '__all__'
 
     def save(self, **kwargs):
+        if self.validated_data["password"] != self.validated_data["confirm_password"]:
+            raise ValueError("Password and Confirm_password must be same")
         self.validated_data["password"] = make_password(self.validated_data["password"])
+        self.validated_data["confirm_password"] = make_password(self.validated_data["confirm_password"])
         self.validated_data["is_active"] = True
         super(UserSerializer, self).save(**kwargs)
 

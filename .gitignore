@@ -1,0 +1,13 @@
+*.xml
+mediafiles/
+
+db.sqlite3
+
+.idea
+
+app/migrations/
+
+task/migrations/
+task/.idea/
+
+.env

@@ -1,0 +1,5 @@
+django-phonenumber-field[phonenumberslite]
+djangorestframework
+rest_framework_simplejwt
+django
+python-dotenv

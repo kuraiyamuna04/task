@@ -17,7 +17,7 @@ class TaskDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskModel
-        fields = ("task", "assignee", "reporter")
+        fields = ("id","task", "assignee", "reporter", "status")
 
     def get_assignee(self, obj):
         obj = obj.assigned_by.userProfiles

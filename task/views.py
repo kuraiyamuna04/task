@@ -4,8 +4,8 @@ from rest_framework.generics import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
-from .serializers import TaskSerializers, TaskDetailsSerializer
-from utils.helper import employee_id, send_emails
+from .serializers import TaskSerializers, TaskDetailsSerializer, UpdateTaskSerializers
+from utils.helper import employee_id, send_emails, calculate_earning
 from .models import TaskModel
 from utils.msg import *
 
@@ -81,13 +81,13 @@ class UpdateStatusView(APIView):
         try:
             user_id = request.user.id
             task_status = request.data["status"]
-            if not employee_id(user_id) or not task_status:
+            if not employee_id(user_id):
                 return Response(unauthorised, status=status.HTTP_401_UNAUTHORIZED)
 
             task = TaskModel.objects.get(id=pk, assigned_to=user_id)
-            serializer = TaskSerializers(task,
-                                         data=request.data,
-                                         partial=True)
+            serializer = UpdateTaskSerializers(task,
+                                               data=request.data,
+                                               partial=True)
             serializer.is_valid()
             task = serializer.save()
             if task_status == TaskModel.REVIEW:
@@ -116,3 +116,21 @@ class UpdateTaskView(APIView):
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GenerateSalary(APIView):
+    permission_classes = [IsAuthenticated, RequiredManager]
+
+    def get(self, request, pk):
+        try:
+            task = TaskModel.objects.filter(assigned_to=pk)
+            serializer = TaskSerializers(task, many=True)
+            count = 0
+            for task in serializer.data:
+                if task["status"] == TaskModel.COMPLETE:
+                    count = count + calculate_earning(task)
+                else:
+                    continue
+            return Response({"total salary is ": count})
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

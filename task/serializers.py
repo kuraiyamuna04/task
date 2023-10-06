@@ -11,13 +11,19 @@ class TaskSerializers(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UpdateTaskSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = TaskModel
+        fields = ("status","time_needed")
+
+
 class TaskDetailsSerializer(serializers.ModelSerializer):
     assignee = serializers.SerializerMethodField()
     reporter = serializers.SerializerMethodField()
 
     class Meta:
         model = TaskModel
-        fields = ("id","task", "assignee", "reporter", "status")
+        fields = ("id", "task", "assignee", "reporter", "status","rate_per_hour","time_needed")
 
     def get_assignee(self, obj):
         obj = obj.assigned_by.userProfiles

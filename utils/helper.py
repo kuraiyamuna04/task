@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 
 def employee_id(user_id):
     try:
-        user = CustomUser.objects.get(id=user_id, role="E")
+        _ = CustomUser.objects.get(id=user_id, role="E")
         return True
     except:
         return False

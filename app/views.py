@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from utils.decorators import RequiredAdmin, RequiredManager
-from utils.helper import Employee_id
+from utils.helper import employee_id
 from utils.msg import *
 
 
@@ -133,7 +133,7 @@ class ManagerCreateProfileView(APIView):
     def post(self, request):
         try:
             user_id = request.POST.get("user")
-            if not Employee_id(user_id):
+            if not employee_id(user_id):
                 return Response(
                     unauthorised,
                     status=status.HTTP_401_UNAUTHORIZED

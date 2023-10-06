@@ -1,0 +1,19 @@
+#Ignore all xml files
+*.xml
+*.iml
+
+mediafiles/
+
+project/db.sqlite3
+
+.idea/inspectionProfiles/
+
+
+
+project/app/migrations/
+
+project/task/migrations/
+
+project/.idea/
+
+.idea

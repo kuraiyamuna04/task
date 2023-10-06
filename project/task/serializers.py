@@ -1,7 +1,5 @@
 from rest_framework import serializers
-
 from .models import TaskModel
-from app.models import CustomUser, UserProfile
 from app.serializerls import UserProfileSerializer, UserSerializer
 
 
@@ -17,7 +15,7 @@ class TaskDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskModel
-        fields = ("task", "assignee", "reporter")
+        fields = ("task", "assignee", "reporter","status")
 
     def get_assignee(self, obj):
         obj = obj.assigned_by.userProfiles

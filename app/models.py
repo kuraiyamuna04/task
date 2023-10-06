@@ -23,7 +23,7 @@ class CustomUser(AbstractUser):
     phone_number = PhoneNumberField(null=False, blank=False, unique=True)
     role = models.CharField(max_length=20, choices=ROLES, default='E')
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['email', 'role', "confirm_password"]
+    REQUIRED_FIELDS = ['email', 'role']
 
     objects = CustomManager()
 

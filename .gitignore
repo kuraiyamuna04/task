@@ -15,7 +15,3 @@ task/.idea/
 *.log
 *.pot
 *.pyc
-task/__pycache__/
-app/__pycache__/
-project/__pycache__/
-utils/__pycache__/

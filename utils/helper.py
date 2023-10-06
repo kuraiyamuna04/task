@@ -3,11 +3,11 @@ from django.core.mail import send_mail
 
 
 def employee_id(user_id):
-    user = CustomUser.objects.get(id=user_id)
-    role = user.role
-    if role == "E":
+    try:
+        user = CustomUser.objects.get(id=user_id, role="E")
         return True
-    return False
+    except:
+        return False
 
 
 def send_emails(message, recipient, request):

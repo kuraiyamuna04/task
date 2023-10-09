@@ -125,7 +125,7 @@ class GenerateSalary(APIView):
 
         try:
             all_task = TaskModel.objects.filter(assigned_to=pk)
-            complete_task = TaskModel.objects.filter(assigned_to=pk, status=TaskModel.COMPLETE).count()
+            complete_task = all_task.filter(status=TaskModel.COMPLETE).count()
             if all_task.count() == complete_task:
                 count = 0
                 for task in all_task:

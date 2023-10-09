@@ -130,6 +130,11 @@ class GenerateSalary(APIView):
                 count = 0
                 for task in all_task:
                     count = count + calculate_earning(task)
+                send_emails(
+                    message=f"Hi your total salary for all tasks is {count}",
+                    recipient=task.assigned_to,
+                    request=request
+                )
                 return Response({"total salary is ": count})
 
             return Response({"msg": "All tasks are not completed by this employee"})

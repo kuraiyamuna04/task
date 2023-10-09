@@ -3,9 +3,9 @@ mediafiles/
 
 .idea
 
-app/migrations/
 
-task/migrations/
+
+
 task/.idea/
 
 # Byte-compiled / optimized / DLL files

@@ -26,6 +26,8 @@ class TaskModel(models.Model):
     )
 
     status = models.CharField(max_length=20, choices=STATUS, default="TD")
+    rate_per_hour = models.IntegerField(default=0)
+    time_needed = models.IntegerField(default=0)
 
     def __str__(self):
         return self.task

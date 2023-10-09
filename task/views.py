@@ -81,7 +81,7 @@ class UpdateStatusView(APIView):
         try:
             user_id = request.user.id
             task_status = request.data["status"]
-            if not employee_id(user_id):
+            if not employee_id(user_id) or task_status == TaskModel.COMPLETE:
                 return Response(unauthorised, status=status.HTTP_401_UNAUTHORIZED)
 
             task = TaskModel.objects.get(id=pk, assigned_to=user_id)
@@ -122,15 +122,17 @@ class GenerateSalary(APIView):
     permission_classes = [IsAuthenticated, RequiredManager]
 
     def get(self, request, pk):
+
         try:
-            tasks = TaskModel.objects.filter(assigned_to=pk)
-            if not tasks:
-                return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
-            count = 0
-            for task in tasks:
-                if task.status != TaskModel.COMPLETE:
-                    return Response({"msg": "All tasks are not completed by this employee"})
-                count = count + calculate_earning(task)
-            return Response({"total salary is ": count})
-        except TaskModel.DoseNotExist:
-            return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
+            all_task = TaskModel.objects.filter(assigned_to=pk)
+            complete_task = TaskModel.objects.filter(assigned_to=pk, status=TaskModel.COMPLETE).count()
+            if all_task.count() == complete_task:
+                count = 0
+                for task in all_task:
+                    count = count + calculate_earning(task)
+                return Response({"total salary is ": count})
+
+            return Response({"msg": "All tasks are not completed by this employee"})
+
+        except TaskModel.DoesNotExist:
+            return Response(no_data, status.HTTP_400_BAD_REQUEST)

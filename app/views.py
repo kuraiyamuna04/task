@@ -46,12 +46,15 @@ class ProfileView(APIView):
         except UserProfile.DoesNotExist:
             return Response(no_data, status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request):
+    def patch(self, request):
         user_id = request.user.id
         try:
             user_profile = UserProfile.objects.get(user_id=user_id)
             profile_serializer = UserProfileSerializer(
-                instance=user_profile, data=request.data, context={'request': request}
+                instance=user_profile,
+                partial=True, 
+                data=request.data,
+                context={'request': request}
             )
 
             if not profile_serializer.is_valid():
@@ -109,9 +112,9 @@ class UpdateProfileView(APIView):
                 success, status=status.HTTP_200_OK
             )
         except UserProfile.DoesNotExist:
-            return Response({
+            return Response(
                 wrong_data
-            }, status=status.HTTP_404_NOT_FOUND)
+            , status=status.HTTP_404_NOT_FOUND)
 
 
 class CreateView(APIView):

@@ -123,15 +123,14 @@ class GenerateSalary(APIView):
 
     def get(self, request, pk):
         try:
-            task = TaskModel.objects.filter(assigned_to=pk)
-            if not task:
+            tasks = TaskModel.objects.filter(assigned_to=pk)
+            if not tasks:
                 return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
-            serializer = TaskSerializers(task, many=True)
             count = 0
-            for task in serializer.data:
-                if task["status"] != TaskModel.COMPLETE:
+            for task in tasks:
+                if task.status != TaskModel.COMPLETE:
                     return Response({"msg": "All tasks are not completed by this employee"})
                 count = count + calculate_earning(task)
             return Response({"total salary is ": count})
-        except TaskModel.DoseNotExists:
+        except TaskModel.DoseNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)

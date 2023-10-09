@@ -20,7 +20,7 @@ def send_emails(message, recipient, request):
 
 
 def calculate_earning(task):
-    time = task["time_needed"]
-    rate = task["rate_per_hour"]
+    time = task.time_needed
+    rate = task.rate_per_hour
     total_earning = time * rate
     return total_earning

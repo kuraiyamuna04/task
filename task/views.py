@@ -131,7 +131,7 @@ class GenerateSalary(APIView):
                 for task in all_task:
                     count = count + calculate_earning(task)
                 send_emails(
-                    message=f"Hi your total salary for all tasks is {count}",
+                    message=f"Hi your total salary for all tasks is Rs. {count}",
                     recipient=task.assigned_to,
                     request=request
                 )

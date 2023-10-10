@@ -14,7 +14,7 @@ def employee_id(user_id):
         return False
 
 
-def send_emails(subject,message, recipient):
+def send_emails(subject, message, recipient):
     send_mail(
         subject=subject,
         message=message,
@@ -35,10 +35,11 @@ def my_scheduled_task():
     tasks = TaskModel.objects.filter(due_date=current_time)
     lst = [
         send_emails
-        (
-         message=f"Tomorrow is the last date of submitting your task {task.task}",
-         recipient=task.assigned_to
-         )
-        for task in tasks
+            (
+            subject="Last Date of Submission",
+            message=f"Tomorrow is the last date of submitting your task {task.task}",
+            recipient=task.assigned_to
+        )
+        for task in tasks if task.status != TaskModel.COMPLETE
     ]
     return lst

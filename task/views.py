@@ -19,23 +19,27 @@ class ManagerAccessView(APIView):
             context={'request': self.request}
         )
         try:
-            assigned_id = request.data["assigned_to"]
-            if not employee_id(assigned_id):
-                return Response(
-                    unauthorised, status=status.HTTP_401_UNAUTHORIZED
-                )
             serializer.initial_data["assigned_by"] = request.user.id
             if not serializer.is_valid():
                 return Response(
                     serializer.errors, status=status.HTTP_400_BAD_REQUEST
                 )
+            assigned_id = request.data["assigned_to"]
+            if not employee_id(assigned_id):
+                return Response(
+                    unauthorised, status=status.HTTP_401_UNAUTHORIZED
+                )
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(assigned, employee_email)
+            send_emails(
+                subject="Task",
+                message=assigned,
+                recipient=employee_email
+            )
 
             return Response(serializer.data)
 
-        except Exception:
+        except AttributeError:
             return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
@@ -70,7 +74,7 @@ class EmployeeAccessView(APIView):
                 task, many=True, context={"request": request}
             )
             return Response(serializer.data)
-        except Exception:
+        except AttributeError:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -92,9 +96,13 @@ class UpdateStatusView(APIView):
             task = serializer.save()
             if task_status == TaskModel.REVIEW:
                 manager_email = task.assigned_by
-                send_emails(review, manager_email)
+                send_emails(
+                    subject="Task Updated",
+                    message=review,
+                    recipient=manager_email
+                )
             return Response(serializer.data)
-        except Exception:
+        except AttributeError:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -112,7 +120,11 @@ class UpdateTaskView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(updated, employee_email)
+            send_emails(
+                subject="Task Updated",
+                message=updated,
+                recipient=employee_email
+            )
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
@@ -131,9 +143,9 @@ class GenerateSalary(APIView):
                 for task in all_task:
                     count = count + calculate_earning(task)
                 send_emails(
+                    subject="Salary Details",
                     message=f"Hi your total salary for all tasks is Rs. {count}",
-                    recipient=task.assigned_to,
-                    request=request
+                    recipient=task.assigned_to
                 )
                 return Response({"total salary is ": count})
 

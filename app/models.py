@@ -5,11 +5,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 import uuid
 import os
 
-ROLES = (("A", "admin"),
-         ("M", "manager"),
-         ("E", "employee")
-         )
-
 
 def get_file_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -18,6 +13,13 @@ def get_file_path(instance, filename):
 
 
 class CustomUser(AbstractUser):
+    Employee = "E"
+    Manager = "M"
+    Admin = "A"
+    ROLES = ((Admin, "admin"),
+             (Manager, "manager"),
+             (Employee, "employee")
+             )
     username = None
     email = models.EmailField(max_length=200, unique=True)
     phone_number = PhoneNumberField(null=False, blank=False, unique=True)
@@ -27,6 +29,11 @@ class CustomUser(AbstractUser):
 
     objects = CustomManager()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['id'])
+        ]
+
     def __str__(self):
         return self.email
 
@@ -34,12 +41,17 @@ class CustomUser(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE,
-        primary_key=True, related_name="userProfiles"
+        primary_key=True, related_name="userProfiles", db_index=True
     )
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=40)
     address = models.CharField(max_length=50)
     profile_img = models.ImageField(upload_to=get_file_path)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user'])
+        ]
 
     def __str__(self):
         return self.first_name

@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     'task',
     'app',
-    "phonenumber_field",
+    "phonenumber_field"
 
 ]
 SIMPLE_JWT = {
@@ -129,7 +129,3 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS")
-
-CRON_CLASSES = [
-    "task.cron.MyCronJob",
-]

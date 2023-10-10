@@ -8,15 +8,15 @@ from task.models import TaskModel
 
 def employee_id(user_id):
     try:
-        _ = CustomUser.objects.get(id=user_id, role="E")
+        _ = CustomUser.objects.get(id=user_id, role=CustomUser.Employee)
         return True
     except:
         return False
 
 
-def send_emails(message, recipient):
+def send_emails(subject,message, recipient):
     send_mail(
-        subject="Task",
+        subject=subject,
         message=message,
         from_email=EMAIL_HOST_USER,
         recipient_list=[recipient]
@@ -33,8 +33,12 @@ def calculate_earning(task):
 def my_scheduled_task():
     current_time = datetime.date.today() + datetime.timedelta(days=1)
     tasks = TaskModel.objects.filter(due_date=current_time)
-    for task in tasks:
-        send_emails(
-            message=f"tomorrow is the last date of submitting your task {task.task}",
-            recipient=task.assigned_to
-        )
+    lst = [
+        send_emails
+        (
+         message=f"Tomorrow is the last date of submitting your task {task.task}",
+         recipient=task.assigned_to
+         )
+        for task in tasks
+    ]
+    return lst

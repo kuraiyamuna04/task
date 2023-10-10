@@ -31,7 +31,7 @@ class ManagerAccessView(APIView):
                 )
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(assigned, employee_email, request)
+            send_emails(assigned, employee_email)
 
             return Response(serializer.data)
 
@@ -92,7 +92,7 @@ class UpdateStatusView(APIView):
             task = serializer.save()
             if task_status == TaskModel.REVIEW:
                 manager_email = task.assigned_by
-                send_emails(review, manager_email, request)
+                send_emails(review, manager_email)
             return Response(serializer.data)
         except Exception:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
@@ -112,7 +112,7 @@ class UpdateTaskView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(updated, employee_email, request)
+            send_emails(updated, employee_email)
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)

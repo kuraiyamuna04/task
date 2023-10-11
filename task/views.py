@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
 from .serializers import TaskSerializers, TaskDetailsSerializer, UpdateTaskSerializers
-from utils.helper import employee_id, send_emails, calculate_earning
+from utils.helper import employee_id, send_emails, calculate_earning, create_table
 from .models import TaskModel
 from utils.msg import *
 
@@ -140,11 +140,16 @@ class GenerateSalary(APIView):
             complete_task = all_task.filter(status=TaskModel.COMPLETE).count()
             if all_task.count() == complete_task:
                 count = 0
+                header = ["task_name", "time", "rate", "earning"]
+                task_list = []
                 for task in all_task:
                     count = count + calculate_earning(task)
+                    task_details = [task.task, task.time_needed, task.rate_per_hour, calculate_earning(task)]
+                    task_list.append(task_details)
+                salary_slip = create_table(header, task_list)
                 send_emails(
                     subject="Salary Details",
-                    message=f"Hi your total salary for all tasks is Rs. {count}",
+                    message=salary_slip,
                     recipient=task.assigned_to
                 )
                 return Response({"total salary is ": count})

@@ -2,6 +2,8 @@ import datetime
 from project.settings import EMAIL_HOST_USER
 from app.models import CustomUser
 from django.core.mail import send_mail
+from django.db.models import Q
+from tabulate import tabulate
 
 from task.models import TaskModel
 
@@ -33,6 +35,7 @@ def calculate_earning(task):
 def my_scheduled_task():
     current_time = datetime.date.today() + datetime.timedelta(days=1)
     tasks = TaskModel.objects.filter(due_date=current_time)
+    tasks = tasks.filter(~Q(status=TaskModel.COMPLETE))
     lst = [
         send_emails
             (
@@ -40,6 +43,11 @@ def my_scheduled_task():
             message=f"Tomorrow is the last date of submitting your task {task.task}",
             recipient=task.assigned_to
         )
-        for task in tasks if task.status != TaskModel.COMPLETE
+        for task in tasks
     ]
     return lst
+
+
+def create_table(header,data):
+    table = tabulate(data, headers=header, tablefmt="grid")
+    return table

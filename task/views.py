@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from utils.decorators import RequiredManager, RequiredAdmin
 from .serializers import TaskSerializers, TaskDetailsSerializer, UpdateTaskSerializers
-from utils.helper import employee_id, send_emails, calculate_earning
+from utils.helper import employee_id, send_emails, calculate_earning, create_table
 from .models import TaskModel
 from utils.msg import *
 
@@ -19,23 +19,27 @@ class ManagerAccessView(APIView):
             context={'request': self.request}
         )
         try:
-            assigned_id = request.data["assigned_to"]
-            if not employee_id(assigned_id):
-                return Response(
-                    unauthorised, status=status.HTTP_401_UNAUTHORIZED
-                )
             serializer.initial_data["assigned_by"] = request.user.id
             if not serializer.is_valid():
                 return Response(
                     serializer.errors, status=status.HTTP_400_BAD_REQUEST
                 )
+            assigned_id = request.data["assigned_to"]
+            if not employee_id(assigned_id):
+                return Response(
+                    unauthorised, status=status.HTTP_401_UNAUTHORIZED
+                )
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(assigned, employee_email, request)
+            send_emails(
+                subject="Task",
+                message=assigned,
+                recipient=employee_email
+            )
 
             return Response(serializer.data)
 
-        except Exception:
+        except AttributeError:
             return Response(wrong_data, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
@@ -70,7 +74,7 @@ class EmployeeAccessView(APIView):
                 task, many=True, context={"request": request}
             )
             return Response(serializer.data)
-        except Exception:
+        except AttributeError:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -92,9 +96,13 @@ class UpdateStatusView(APIView):
             task = serializer.save()
             if task_status == TaskModel.REVIEW:
                 manager_email = task.assigned_by
-                send_emails(review, manager_email, request)
+                send_emails(
+                    subject="Task Updated",
+                    message=review,
+                    recipient=manager_email
+                )
             return Response(serializer.data)
-        except Exception:
+        except AttributeError:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -112,7 +120,11 @@ class UpdateTaskView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             task = serializer.save()
             employee_email = task.assigned_to
-            send_emails(updated, employee_email, request)
+            send_emails(
+                subject="Task Updated",
+                message=updated,
+                recipient=employee_email
+            )
             return Response(serializer.data)
         except TaskModel.DoesNotExist:
             return Response(no_data, status=status.HTTP_400_BAD_REQUEST)
@@ -128,12 +140,17 @@ class GenerateSalary(APIView):
             complete_task = all_task.filter(status=TaskModel.COMPLETE).count()
             if all_task.count() == complete_task:
                 count = 0
+                header = ["task_name", "time", "rate", "earning"]
+                task_list = []
                 for task in all_task:
                     count = count + calculate_earning(task)
+                    task_details = [task.task, task.time_needed, task.rate_per_hour, calculate_earning(task)]
+                    task_list.append(task_details)
+                salary_slip = create_table(header, task_list)
                 send_emails(
-                    message=f"Hi your total salary for all tasks is Rs. {count}",
-                    recipient=task.assigned_to,
-                    request=request
+                    subject="Salary Details",
+                    message=salary_slip,
+                    recipient=task.assigned_to
                 )
                 return Response({"total salary is ": count})
 

@@ -148,7 +148,7 @@ class ManagerCreateProfileView(APIView):
                 )
             serializer.save()
             return Response(success)
-        except Exception:
+        except KeyError:
             return Response(
                 wrong_data, status=status.HTTP_400_BAD_REQUEST
             )

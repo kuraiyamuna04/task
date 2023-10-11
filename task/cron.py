@@ -1,5 +1,5 @@
-from utils.helper import my_scheduled_task
 from apscheduler.schedulers.background import BackgroundScheduler
+from task.schedular import my_scheduled_task
 
 
 def start():
